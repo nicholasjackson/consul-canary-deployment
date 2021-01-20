@@ -1,57 +1,113 @@
-local_ingress "connector-http" {
-  target = "k8s_cluster.dc1"
-  destination = "localhost"
-
-  port {
-    remote = 9090
-    local = 30002
+// ingress exposing a local application
+// would enable traffic on the K8s cluster dc1 sent to:
+//      my-local-service.shipyard.svc.cluster.local:9090
+// to be directed to:
+//      localhost:30002
+// on the shipyard host
+ingress "connector-k8-to-local" {
+  source {
+    driver = "k8s"
+    
+    config {
+      cluster = "k8s_cluster.dc1"
+      service = "my-local-service"
+      port = 9090
+    }
+  }
+  
+  destination {
+    driver = "local"
+    
+    config { 
+      service = "localhost"
+      port = 30002
+    }
+  
   }
 }
 
-k8s_ingress "connector-http" {
-  cluster = "k8s_cluster.dc1"
-  service  = "connector-http"
-  namespace = "shipyard"
-
-  network {
-    name = "network.dc1"
+// ingress exposing an application on one K8s cluster to the shipyard host
+// would enable traffic on the shipyard host sent to:
+//      localhost:9090
+// to be directed to:
+//      dc1-service.mynamespace.svc.cluster.local:30002
+// on the dc1 cluster
+ingress "connector-local-to-k8" {
+  source {
+    driver = "local"
+    
+    config {
+      service = "localhost"
+      port = 9090
+    }
   }
-
-  port {
-    local  = 9090
-    remote = 9090
-    host   = 10000
+  
+  destination {
+    driver = "k8s"
+    
+    config {
+      cluster = "k8s_cluster.dc1"
+      service = "my-local-service"
+      namespace = "shipyard"
+      port = 9090
+    }
   }
 }
 
-// ingress to K3s service connector
-// sends traffic to an existing service
-//ingress "bla" {
-//  driver = "k8s"
+//// ingress exposing an application on one K8s cluster to another 
+//// would enable traffic on the K8s cluster dc1 sent to:
+////      dc1-service.shipyard.svc.cluster.local:9090
+//// to be directed to:
+////      dc2-service.mynamespace.svc.cluster.local:30002
+//// on the dc2 cluster
+//ingress "connector-k8-to-k8" {
+//  source {
+//    driver = "k8s"
+//    
+//    config = {
+//      cluster = "k8s_cluster.dc1"
+//      service = "dc1-service"
+//      port = 9090
+//    }
 //
-//  config = {
-//    cluster = "dc1"
 //  }
 //  
-//  port {
-//    remote = 9090
-//    local = 30002
+//  destination {
+//    driver = "k8s"
+//    
+//    config = {
+//      cluster = "k8s_cluster.dc2"
+//      service = "dc2-service"
+//      namespace = "mynamespace"
+//      port = 30002
+//    }
+//
 //  }
-// 
-//  // traffic sent to bla is forwarded to this address
-//  destination = "connector.shipyard.svc.local"
 //}
 //
-//// ingress from K3s cluster to local machine
-//// creates a service called bla in namespace shipyard
-//ingress "bla" {
-//  driver = "local"
-//  
-//  port {
-//    remote = 9090
-//    local = 30002
+//// ingress exposing an application in a Docker container to the shipyard host
+//// would enable traffic on the shipyard host sent to:
+////      localhost:9090
+//// to be directed to:
+////      consul.container.shipyard.run:30002
+//// on the Docker host
+//ingress "connector-local-to-docker" {
+//  destination {
+//    driver = "docker"
+//    
+//    config = {
+//      service = "consul.container.shipyard.run"
+//      docker_host = docker_host()
+//      port = 8500
+//    }
 //  }
 //  
-//  // traffic sent to bla is forwarded to this address
-//  destination = "localhost"
+//  source {
+//    driver = "local"
+//    
+//    config = {
+//      service = "localhost"
+//      port = 9090
+//    }
+//  }
 //}
