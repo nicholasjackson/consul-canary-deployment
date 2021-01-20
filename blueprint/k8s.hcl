@@ -8,7 +8,7 @@ k8s_cluster "dc1" {
   nodes = 1
 
   network {
-    name = "network.${var.consul_network}"
+    name = "network.dc1"
   }
 
   image {

@@ -2,7 +2,7 @@
 // Install Consul using the helm chart.
 //
 helm "consul" {
-  cluster = "k8s_cluster.dc1"
+  cluster = "k8s_cluster.${var.consul_k8s_cluster}"
 
   // chart = "github.com/hashicorp/consul-helm?ref=crd-controller-base"
   chart = "github.com/hashicorp/consul-helm?ref=v0.28.0"
@@ -15,7 +15,7 @@ helm "consul" {
 }
 
 k8s_ingress "consul-http" {
-  cluster = "k8s_cluster.dc1"
+  cluster = "k8s_cluster.${var.consul_k8s_cluster}"
 
   network {
     name = "network.${var.consul_network}"

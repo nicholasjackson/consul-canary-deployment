@@ -12,6 +12,7 @@ Consul Service Mesh with CRDs enabled.
 
 To use this module the following resources are required:
 
+* consul_k8s_cluster - name of the network the resources should be attached to
 * consul_network - name of the network the resources should be attached to
 
 ## Usage
