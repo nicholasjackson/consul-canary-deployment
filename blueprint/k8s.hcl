@@ -10,9 +10,5 @@ k8s_cluster "dc1" {
   network {
     name = "network.dc1"
   }
-
-  image {
-    name = "hashicorpdev/consul"
-  }
 }
 
