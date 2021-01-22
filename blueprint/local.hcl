@@ -10,7 +10,6 @@ ingress "connector-k8-to-local" {
     
     config {
       cluster = "k8s_cluster.dc1"
-      service = "my-local-service"
       port = 9091
     }
   }
@@ -19,7 +18,7 @@ ingress "connector-k8-to-local" {
     driver = "local"
     
     config { 
-      service = "localhost"
+      address = "localhost"
       port = 30002
     }
   
@@ -37,7 +36,6 @@ ingress "connector-local-to-k8" {
     driver = "local"
     
     config {
-      service = "localhost"
       port = 9090
     }
   }
@@ -47,9 +45,8 @@ ingress "connector-local-to-k8" {
     
     config {
       cluster = "k8s_cluster.dc1"
-      service = "my-local-service"
-      namespace = "shipyard"
-      port = 9091
+      address = "connector.shipyard.svc"
+      port = 60001
     }
   }
 }
