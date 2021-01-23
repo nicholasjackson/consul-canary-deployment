@@ -4,7 +4,7 @@
 // to be directed to:
 //      localhost:30002
 // on the shipyard host
-ingress "connector-k8-to-local" {
+ingress "k8s-to-local" {
   source {
     driver = "k8s"
     
@@ -31,12 +31,12 @@ ingress "connector-k8-to-local" {
 // to be directed to:
 //      dc1-service.mynamespace.svc.cluster.local:30002
 // on the dc1 cluster
-ingress "connector-local-to-k8" {
+ingress "local-to-k8s" {
   source {
     driver = "local"
     
     config {
-      port = 9090
+      port = 9092
     }
   }
   
@@ -45,8 +45,8 @@ ingress "connector-local-to-k8" {
     
     config {
       cluster = "k8s_cluster.dc1"
-      address = "connector.shipyard.svc"
-      port = 60001
+      address = "k8s-to-local.shipyard.svc"
+      port = 9091
     }
   }
 }

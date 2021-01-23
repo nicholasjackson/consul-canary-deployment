@@ -16,7 +16,7 @@ helm "prometheus_stack" {
   }
 }
 
-k8s_config "prometheus_" {
+k8s_config "prometheus" {
   depends_on = ["helm.prometheus_stack"]
 
   cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
@@ -28,16 +28,21 @@ k8s_config "prometheus_" {
 }
 
 ingress "prometheus" {
-  target = "k8s_cluster.${var.monitoring_k8s_cluster}"
-  service = "svc/grafana"
-
-  port {
-    local = 9090
-    remote = 9090
-    host = 9090
+  source {
+    driver = "local"
+    
+    config {
+      port = 9090
+    }
   }
   
-  network {
-    name = "network.${var.monitoring_network}"
+  destination {
+    driver = "k8s"
+    
+    config {
+      cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
+      address = "prometheus-stack-kube-prom-prometheus.default.svc"
+      port = 9090
+    }
   }
 }

@@ -16,16 +16,21 @@ helm "grafana" {
 }
 
 ingress "grafana" {
-  target = "k8s_cluster.${var.monitoring_k8s_cluster}"
-  service = "svc/grafana"
-
-  port {
-    local = 80
-    remote = 80
-    host = 8080
+  source {
+    driver = "local"
+    
+    config {
+      port = 8080
+    }
   }
   
-  network {
-    name = "network.${var.monitoring_network}"
+  destination {
+    driver = "k8s"
+    
+    config {
+      cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
+      address = "grafana.default.svc"
+      port = 80
+    }
   }
 }

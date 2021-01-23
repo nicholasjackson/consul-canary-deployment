@@ -14,18 +14,22 @@ helm "consul" {
   }
 }
 
-k8s_ingress "consul-http" {
-  cluster = "k8s_cluster.${var.consul_k8s_cluster}"
-
-  network {
-    name = "network.${var.consul_network}"
+ingress "consul" {
+  source {
+    driver = "local"
+    
+    config {
+      port = 8500
+    }
   }
-
-  service  = "consul-ui"
-
-  port {
-    local  = 80
-    remote = 80
-    host   = 8500
+  
+  destination {
+    driver = "k8s"
+    
+    config {
+      cluster = "k8s_cluster.${var.consul_k8s_cluster}"
+      address = "consul-ui.default.svc"
+      port = 80
+    }
   }
 }
