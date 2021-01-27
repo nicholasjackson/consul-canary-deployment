@@ -35,7 +35,7 @@ jobs:
       - checkout
       - gke/install
       - gke/init
-      - gke/update-kubeconfig-with-credentials
+      - gke/update-kubeconfig-with-credentials:
           cluster: cluster-1
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
