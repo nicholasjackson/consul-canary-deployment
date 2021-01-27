@@ -33,10 +33,10 @@ jobs:
     machine: true
     steps:
       - checkout
-      - gke/install
-      - gke/init
       - gke/update-kubeconfig-with-credentials:
           cluster: cluster-1
+          install-kubectl: true
+          perform-login: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: app/api.yaml
