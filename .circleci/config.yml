@@ -12,12 +12,31 @@ jobs:
     machine: true
     steps:
       - checkout
+      - run:
+          name: build app
+          command: sleep 10
+  unit-test:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: unit test
+          command: sleep 10
+  functional-test:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: functional test
+          command: sleep 10
   create-update-deployment:
     machine: true
     steps:
       - checkout
       - gke/install
       - gke/init
+      - gke/update-kubeconfig-with-credentials
+          cluster: cluster-1
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: app/api.yaml
@@ -28,6 +47,13 @@ workflows:
   build_and_deploy:
     jobs:
       - build
-      - create-update-deployment:
+      - unit-test:
           requires:
             - build
+      - functional-test:
+          requires:
+            - build
+      - create-update-deployment:
+          requires:
+            - unit-test
+            - functional-test
