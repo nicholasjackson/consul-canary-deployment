@@ -23,8 +23,10 @@ jobs:
           resource-name: deployment/api
           show-kubectl-command: true
 
-workflow:
+workflows:
   build_and_deploy:
     jobs:
       - build
-      - create-update-deployment
+      - create-update-deployment:
+          requires:
+            - build
