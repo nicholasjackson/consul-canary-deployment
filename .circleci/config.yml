@@ -3,7 +3,7 @@ version: 2.1
 # Use a package of configuration called an orb.
 orbs:
   # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
+  node: circleci/node@1.0.1
   kubernetes: circleci/gcp-gke@0.1.0
 
 jobs:
@@ -11,7 +11,6 @@ jobs:
     machine: true
     steps:
       - checkout
-      - welcome/run
   create-update-deployment:
     machine: true
     steps:
@@ -23,3 +22,9 @@ jobs:
           resource-file-path: app/api.yaml
           resource-name: deployment/api
           show-kubectl-command: true
+
+workflow:
+  build_and_deploy:
+    jobs:
+      - build
+      - create-update-deployment
