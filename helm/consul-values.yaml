@@ -16,7 +16,7 @@ server:
         "enabled": true,
         "metrics_provider": "prometheus",
         "metrics_proxy": {
-          "base_url": "http://prometheus-stack-kube-prom-prometheus.default.svc:9090"
+          "base_url": "http://prometheus-kube-prometheus-prometheus.default.svc:9090"
         }
       }
     }

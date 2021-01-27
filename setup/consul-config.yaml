@@ -1,0 +1,57 @@
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: web
+spec:
+  protocol: http
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: api
+spec:
+  protocol: http
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceRouter
+metadata:
+  name: api
+spec:
+  routes:
+  - destination:
+      service: "api"
+      numRetries: 3
+      retryOnStatusCodes: [500]
+
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceResolver
+metadata:
+  name: api
+spec:
+  defaultSubset: api-primary
+  subsets:
+    api-primary:
+      filter: "Service.ID contains \"api-primary\""
+      onlyPassing: true
+    api-canary:
+      filter: "Service.ID not contains \"api-primary\""
+      onlyPassing: true
+
+      #---
+      #apiVersion: split.smi-spec.io/v1alpha1
+      #kind: TrafficSplit
+      #metadata:
+      #  name: api-split
+      #spec:
+      #  # The root service that clients use to connect to the destination application.
+      #  service: api
+      #  # Services inside the namespace with their own selectors, endpoints and configuration.
+      #  backends:
+      #  - service: api-primary
+      #    weight: "10"
+      #  - service: api-canary
+      #    weight: "90"
