@@ -4,7 +4,8 @@ version: 2.1
 orbs:
   # Declare a dependency on the welcome-orb
   node: circleci/node@1.0.1
-  kubernetes: circleci/gcp-gke@0.1.0
+  gke: circleci/gcp-gke@0.1.0
+  kubernetes: circleci/kubernetes@0.11.2
 
 jobs:
   build:
@@ -15,8 +16,8 @@ jobs:
     machine: true
     steps:
       - checkout
-      - kubernetes/install
-      - kubernetes/init
+      - gke/install
+      - gke/init
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: app/api.yaml
