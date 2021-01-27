@@ -34,10 +34,10 @@ spec:
         group: api
       annotations:
         "consul.hashicorp.com/connect-inject": "true"
-        #"consul.hashicorp.com/service-meta-version": "v1"
-        #"consul.hashicorp.com/service-tags": "v1"
-        "consul.hashicorp.com/service-meta-version": "v2"
-        "consul.hashicorp.com/service-tags": "v2"
+        "consul.hashicorp.com/service-meta-version": "v1"
+        "consul.hashicorp.com/service-tags": "v1"
+        #"consul.hashicorp.com/service-meta-version": "v2"
+        #"consul.hashicorp.com/service-tags": "v2"
     spec:
       containers:
       - name: api
