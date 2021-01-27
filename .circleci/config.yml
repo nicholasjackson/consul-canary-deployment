@@ -44,7 +44,7 @@ jobs:
           show-kubectl-command: true
 
 workflows:
-  build_and_deploy:
+  build-and-deploy:
     jobs:
       - build
       - unit-test:
@@ -57,3 +57,7 @@ workflows:
           requires:
             - unit-test
             - functional-test
+          filters:
+            branches:
+              only:
+                - main
