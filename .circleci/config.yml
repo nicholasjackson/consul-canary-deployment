@@ -5,23 +5,19 @@ orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
   kubernetes: circleci/gcp-gke@0.1.0
-# Orchestrate or schedule a set of jobs
-workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
-    jobs:
-      build:
-          - checkout
-          - welcome/run
-      create-update-deployment:
-        machine: true
-        steps:
-          - checkout
-          - kubernetes/install
-          - kubernetes/init
-          - kubernetes/create-or-update-resource:
-              get-rollout-status: true
-              resource-file-path: app/api.yaml
-              resource-name: deployment/api
-              show-kubectl-command: true
+
+jobs:
+  build:
+      - checkout
+      - welcome/run
+  create-update-deployment:
+    machine: true
+    steps:
+      - checkout
+      - kubernetes/install
+      - kubernetes/init
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: app/api.yaml
+          resource-name: deployment/api
+          show-kubectl-command: true
