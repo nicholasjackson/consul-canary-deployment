@@ -58,8 +58,8 @@ Get the username and password
 
 
 ```
-grafana_username=$(k get secrets grafana -o json | jq -r '.data."admin-user"' | base64 -d)
-grafana_password=$(k get secrets grafana -o json | jq -r '.data."admin-password"' | base64 -d)
+grafana_username=$(kubectl get secrets grafana -o json | jq -r '.data."admin-user"' | base64 -d)
+grafana_password=$(kubectl get secrets grafana -o json | jq -r '.data."admin-password"' | base64 -d)
 echo "user: $grafana_username"
 echo "password: $grafana_password"
 ```
