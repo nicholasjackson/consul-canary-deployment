@@ -29,7 +29,7 @@ spec:
     maxWeight: 80
     # canary increment step
     # percentage (0-100)
-    stepWeight: 20
+    stepWeight: 10
     # Linkerd Prometheus checks
     metrics:
     - name: "consul-requests"
