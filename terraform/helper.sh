@@ -18,6 +18,10 @@ function grafana_pass() {
   echo "password: $grafana_password"
 }
 
+function fetch_config() {
+  gcloud container clusters get-credentials $(terraform output name) --zone $(terraform output location) --project $(terraform output project)
+}
+
 case "$1" in
   expose)
     expose
@@ -28,11 +32,15 @@ case "$1" in
   grafana_pass)
     grafana_pass
     ;;
+  fetch_config)
+    fetch_config
+    ;;
   *)
     echo "Usage:"
     echo "       expose         - expose Kubernetes services to localhost"
     echo "       stop           - stop exposing Kubernetes services to localhost"
     echo "       grafana_pass   - Show the Grafana username and password"
+    echo "       fetch_config   - Fetch the Kubernetes config file and configure kubectl" 
     exit 1
   esac
 

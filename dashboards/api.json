@@ -34,7 +34,7 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 17,
         "x": 0,
         "y": 0
       },
@@ -51,7 +51,7 @@
       },
       "lines": true,
       "linewidth": 1,
-      "nullPointMode": "null",
+      "nullPointMode": "null as zero",
       "options": {
         "alertThreshold": true
       },
@@ -66,9 +66,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(envoy_http_downstream_rq_total{consul_source_service=\"web\", envoy_http_conn_manager_prefix=\"upstream\"}[30s])",
+          "expr": "rate(envoy_http_downstream_rq_xx{pod=~\"web.*\", local_cluster=\"web\", envoy_http_conn_manager_prefix=\"upstream\", envoy_response_code_class=~\"2|5\"}[30s])",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "Response Code {{envoy_response_code_class}}xx",
           "refId": "A"
         }
       ],
@@ -114,6 +114,60 @@
       }
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 17,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "7.3.5",
+      "targets": [
+        {
+          "expr": "sum(rate(envoy_cluster_upstream_rq_retry{consul_source_service=\"web\"}[30s]))",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Retries per Second",
+      "type": "gauge"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -128,21 +182,22 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 24,
+        "h": 11,
+        "w": 17,
         "x": 0,
         "y": 8
       },
       "hiddenSeries": false,
-      "id": 3,
+      "id": 4,
       "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
         "show": true,
-        "total": false,
-        "values": false
+        "total": true,
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -155,23 +210,38 @@
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [],
+      "seriesOverrides": [
+        {
+          "alias": "Primary - 200",
+          "color": "#73BF69"
+        },
+        {
+          "alias": "Canary - 200",
+          "color": "#FADE2A"
+        }
+      ],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(envoy_cluster_upstream_rq{pod=~\"api-primary.*\", namespace=\"default\", envoy_cluster_name=\"local_app\"}[30s])",
+          "expr": "sum by (envoy_response_code) (rate(envoy_cluster_upstream_rq{pod!~\"api-primary.*\", namespace=\"default\", envoy_cluster_name=\"local_app\"}[30s]))",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "Canary - {{envoy_response_code}}",
           "refId": "A"
+        },
+        {
+          "expr": "sum by (envoy_response_code) (rate(envoy_cluster_upstream_rq{pod=~\"api-primary.*\", namespace=\"default\", envoy_cluster_name=\"local_app\"}[30s]))",
+          "interval": "",
+          "legendFormat": "Primary - {{envoy_response_code}}",
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "API V1 Requests",
+      "title": "API Request per Second",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -187,11 +257,12 @@
       },
       "yaxes": [
         {
+          "decimals": null,
           "format": "short",
           "label": null,
           "logBase": 1,
-          "max": null,
-          "min": null,
+          "max": "20",
+          "min": "0",
           "show": true
         },
         {
@@ -210,36 +281,51 @@
     },
     {
       "aliasColors": {},
-      "bars": false,
+      "bars": true,
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 16
+        "h": 11,
+        "w": 7,
+        "x": 17,
+        "y": 8
       },
       "hiddenSeries": false,
-      "id": 4,
+      "id": 3,
       "legend": {
+        "alignAsTable": true,
         "avg": false,
-        "current": false,
+        "current": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
-      "lines": true,
+      "lines": false,
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
@@ -252,21 +338,27 @@
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(envoy_cluster_upstream_rq{pod!~\"api-primary.*\", namespace=\"default\", envoy_cluster_name=\"local_app\"}[30s])",
+          "expr": "sum(kube_pod_status_ready{pod=~\"api-primary.*\", pod=~\"api.*\"})",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "Primary",
           "refId": "A"
+        },
+        {
+          "expr": "sum(kube_pod_status_ready{pod!~\"api-primary.*\", pod=~\"api.*\"})",
+          "interval": "",
+          "legendFormat": "Canary",
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "API V2 Requests",
+      "title": "Running Instances",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -282,11 +374,12 @@
       },
       "yaxes": [
         {
+          "decimals": null,
           "format": "short",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -302,9 +395,60 @@
         "align": false,
         "alignLevel": null
       }
+    },
+    {
+      "datasource": "Loki",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null,
+            "filterable": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      },
+      "id": 8,
+      "options": {
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "7.3.5",
+      "targets": [
+        {
+          "expr": "{app=\"smi-controller\"} |= \"TrafficSplit\"",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "SMI Controller Logs",
+      "type": "logs"
     }
   ],
-  "refresh": "30s",
+  "refresh": "10s",
   "schemaVersion": 26,
   "style": "dark",
   "tags": [],
@@ -319,5 +463,5 @@
   "timezone": "",
   "title": "Canary",
   "uid": "irtYjefGk",
-  "version": 4
+  "version": 21
 }

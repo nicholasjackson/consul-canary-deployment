@@ -29,7 +29,7 @@ spec:
     maxWeight: 80
     # canary increment step
     # percentage (0-100)
-    stepWeight: 20
+    stepWeight: 10
     # Linkerd Prometheus checks
     metrics:
     - name: "consul-requests"
@@ -100,13 +100,3 @@ spec:
         )
       ) by (le)
     )
-
----
-apiVersion: flagger.app/v1beta1
-kind: AlertProvider
-metadata:
-  name: on-call
-  namespace: default
-spec:
-  type: discord
-  address: https://discord.com/api/webhooks/804023093223227452/AeycC6xLY1H_CoFbPh_QwWUQ8EZRnZ24km-rNkrfVKs8Rh0cTceb_WHBPfhYX5CYOfO_

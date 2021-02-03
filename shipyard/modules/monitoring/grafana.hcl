@@ -12,7 +12,11 @@ helm "grafana" {
   cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
 
   chart = "github.com/grafana/helm-charts/charts//grafana"
-  values = "./helm/grafana_values.yaml"
+  values = var.monitoring_helm_values_grafana
+
+  values_string = {
+   "admin.existingSecret" = "grafana-password"
+  }
 }
 
 ingress "grafana" {

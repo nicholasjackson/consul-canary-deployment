@@ -1,5 +1,12 @@
-image:
-  repository: nicholasjackson/smi-controller-consul
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "dev"
+---
+
+controller:
+  image:
+    repository: nicholasjackson/smi-controller-consul
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "dev"
+
+  env:
+    - name: CONSUL_HTTP_ADDR
+      value: http://consul-server.default.svc:8500
