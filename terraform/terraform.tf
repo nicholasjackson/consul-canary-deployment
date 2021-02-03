@@ -1,3 +1,26 @@
+terraform {
+  required_providers {
+    helm = {
+      source = "hashicorp/helm"
+      version = "1.3.2"
+    }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "1.13.3"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+    }
+    google = {
+      source = "hashicorp/google"
+      version = "3.50.0"
+    }
+  }
+
+  required_version = ">= 0.13.5"
+}
+
 # Set the environment variables GOOGLE_PROJECT AND GOOGLEG_REGION
 provider "google" {}
 
@@ -58,6 +81,16 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(
     google_container_cluster.mycluster.master_auth[0].cluster_ca_certificate,
   )
+}
+
+provider "kubectl" {
+  host  = "https://${google_container_cluster.mycluster.endpoint}"
+  token = data.google_client_config.provider.access_token
+  cluster_ca_certificate = base64decode(
+    google_container_cluster.mycluster.master_auth[0].cluster_ca_certificate,
+  )
+
+  load_config_file = false
 }
 
 provider "helm" {

@@ -6,7 +6,7 @@ helm "consul" {
 
   // chart = "github.com/hashicorp/consul-helm?ref=crd-controller-base"
   chart = "github.com/hashicorp/consul-helm?ref=v0.28.0"
-  values = "./helm/consul-values.yaml"
+  values = var.consul_helm_values
 
   health_check {
     timeout = "60s"

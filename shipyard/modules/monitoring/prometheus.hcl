@@ -1,4 +1,4 @@
-helm "prometheus_stack" {
+helm "prometheus" {
   cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
   
   chart_name = "prometheus-stack"
@@ -17,7 +17,7 @@ helm "prometheus_stack" {
 }
 
 k8s_config "prometheus" {
-  depends_on = ["helm.prometheus_stack"]
+  depends_on = ["helm.prometheus"]
 
   cluster = "k8s_cluster.${var.monitoring_k8s_cluster}"
   paths = [

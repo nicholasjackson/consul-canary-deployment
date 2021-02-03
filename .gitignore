@@ -2,3 +2,4 @@
 .terraform
 terraform.tfstate
 terraform.backup
+terraform.tfstate.backup

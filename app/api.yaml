@@ -34,8 +34,7 @@ spec:
         group: api
       annotations:
         "consul.hashicorp.com/connect-inject": "true"
-        "consul.hashicorp.com/service-meta-version": "v4"
-        "consul.hashicorp.com/service-tags": "v4"
+        "consul.hashicorp.com/service-tags": "v1"
     spec:
       containers:
       - name: api
@@ -44,10 +43,10 @@ spec:
         - containerPort: 9090
         env:
         - name: "LISTEN_ADDR"
-          value: "0.0.0.0:9090"
+          value: "127.0.0.1:9090"
         - name: "NAME"
-          value: "api-v3"
+          value: "api"
         - name: "MESSAGE"
-          value: "Response from API v3"
-        - name: "ERROR_RATE"
-          value: "0.5"
+          value: "Response from API"
+          #  - name: "ERROR_RATE"
+          #    value: "0.2"

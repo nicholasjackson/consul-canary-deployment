@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: load-test
+  name: load-generator
   namespace: default
 data:
   load_test.js: |
@@ -39,21 +39,21 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loadtest-deployment
+  name: load-generator-deployment
   labels:
     app: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: loadtest
+      app: load-generator
   template:
     metadata:
       labels:
-        app: loadtest
+        app: load-generator
     spec:
       containers:
-      - name: loadtest
+      - name: load-generator
         image: loadimpact/k6
         command: ["k6", "run", "/etc/config/load_test.js"]
         volumeMounts:
@@ -62,4 +62,4 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: load-test
+            name: load-generator

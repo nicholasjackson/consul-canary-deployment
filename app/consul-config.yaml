@@ -40,18 +40,3 @@ spec:
     api-canary:
       filter: "Service.ID not contains \"api-primary\""
       onlyPassing: true
-
-      #---
-      #apiVersion: split.smi-spec.io/v1alpha1
-      #kind: TrafficSplit
-      #metadata:
-      #  name: api-split
-      #spec:
-      #  # The root service that clients use to connect to the destination application.
-      #  service: api
-      #  # Services inside the namespace with their own selectors, endpoints and configuration.
-      #  backends:
-      #  - service: api-primary
-      #    weight: "10"
-      #  - service: api-canary
-      #    weight: "90"
