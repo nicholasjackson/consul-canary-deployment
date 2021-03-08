@@ -13,10 +13,6 @@ spec:
     protocol: TCP
     port: 9090
     targetPort: 9090
-  - name: metrics
-    protocol: TCP
-    port: 9102
-    targetPort: 9102
 
 ---
 # Web frontend
@@ -27,7 +23,7 @@ metadata:
   labels:
     app: web
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: web

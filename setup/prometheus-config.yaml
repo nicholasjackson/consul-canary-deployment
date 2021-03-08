@@ -18,3 +18,19 @@ spec:
   selector:
     matchLabels:
       app: metrics
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: metrics-service
+  labels:
+    app: metrics
+spec:
+  selector:
+    metrics: enabled
+  ports:
+  - name: metrics
+    protocol: TCP
+    port: 9102
+    targetPort: 9102

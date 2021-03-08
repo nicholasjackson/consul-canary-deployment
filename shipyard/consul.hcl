@@ -1,8 +1,8 @@
 module "consul" {
-  source = "./modules/consul"
+  source = "github.com/nicholasjackson/hashicorp-shipyard-modules//modules/consul"
 }
 
-module "monitoring" {
+module "smi_controller" {
   depends_on = ["module.consul"]
-  source = "./modules/monitoring"
+  source = "github.com/nicholasjackson/hashicorp-shipyard-modules//modules/smi-controller"
 }

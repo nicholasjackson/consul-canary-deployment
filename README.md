@@ -156,7 +156,7 @@ and the parameters for the roll out. In the `analysis` section of the following 
 see these parameters. The definition tells flagger that you would like to increase the traffic sent to the canary 
 by 10% when the success rate is 99% or greater.
 
-```
+```yaml
 ---
 apiVersion: flagger.app/v1beta1
 kind: Canary
@@ -202,6 +202,7 @@ spec:
       thresholdRange:
         min: 99
       interval: 1m
+```
 
 ### Grafana dashboard
 
@@ -341,7 +342,7 @@ the service mesh. It also has an additional annotation `"consul.hashicorp.com/se
 annotation performs no function other than adding a tag to Consuls service catalog so that you can
 easily determine the version of the application.
 
-```
+```yaml
 ---
 # API service version 1
 apiVersion: apps/v1
@@ -382,11 +383,11 @@ spec:
 
 ## Installing the application
 
-```
+```shell
 ➜ k apply -f ../app
 ```
 
-```
+```shell
 service/api-service created
 deployment.apps/api created
 servicedefaults.consul.hashicorp.com/web created
@@ -500,7 +501,7 @@ spec:
 ➜ k apply -f ../app/api.yaml
 ```
 
-```
+```shell
 service/api-service unchanged
 deployment.apps/api configured
 ```

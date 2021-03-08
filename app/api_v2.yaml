@@ -30,7 +30,7 @@ spec:
         - name: "LISTEN_ADDR"
           value: "127.0.0.1:9090"
         - name: "NAME"
-          value: "api"
+          value: "api v2"
         - name: "MESSAGE"
           value: "Response from API"
           #  - name: "ERROR_RATE"

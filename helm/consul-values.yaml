@@ -39,7 +39,7 @@ connectInject:
     # on any given pod will override this value. A protocol must be provided,
     # either through this setting or individual annotation, for a service to be
     # registered correctly. Valid values are "http", "http2", "grpc" and "tcp".
-    defaultProtocol: "http"
+    defaultProtocol: "tcp"
 
     # proxyDefaults is a raw json string that will be applied to all Connect
     # proxy sidecar pods that can include any valid configuration for the
