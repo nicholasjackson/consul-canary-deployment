@@ -5,11 +5,11 @@ helm "flagger" {
   values = "${file_dir()}/../helm/flagger-values.yaml"
 }
 
-k8s_config "flagger-crds" {
-  cluster = "k8s_cluster.dc1"
-  paths = [
-    "${file_dir()}/../setup/flagger-crds.yaml",
-  ]
-
-  wait_until_ready = true
-}
+#k8s_config "flagger-crds" {
+#  cluster = "k8s_cluster.dc1"
+#  paths = [
+#    "${file_dir()}/../setup/flagger-crds.yaml",
+#  ]
+#
+#  wait_until_ready = true
+#}
