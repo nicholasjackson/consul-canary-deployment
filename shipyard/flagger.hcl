@@ -1,4 +1,5 @@
 helm "flagger" {
+  depends_on = ["module.consul_stack"]
   cluster = "k8s_cluster.dc1"
   chart = "github.com/fluxcd/flagger/charts//flagger"
 

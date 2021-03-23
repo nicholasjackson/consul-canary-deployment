@@ -1,252 +1,73 @@
 ---
 id: index
-title: Canary Deployments with Flagger and Consul Service Mesh
+title: Automated Canary Deployments with Flagger and Consul Service Mesh
 sidebar_label: Introduction
 ---
 
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import TabItem from '@theme/TabItem'
 
-Blah blah two tier application
+<Tabs
+  className="unique-tabs"
+  groupId="environment"
+  defaultValue="shipyard"
+  values={[
+    {label: 'Shipyard', value: 'shipyard'},
+    {label: 'External Cluster', value: 'external'},
+  ]}>
 
-## Setup
 
-To setup the required software for this example please follow one of the following guides:
+  </Tabs>
 
-* [Manual Setup](./manual_setup/README.md)
-* [GKE Terraform](./terraform/README.md)
-* [Local Setup with Docker](./shipyard/README.md)
+In this tutorial you will see how you can deploy an application using a technique called a Canary Deployment. Rather than deploying
+an application and immediately routing traffic to it as soon as it is healthy. You gradually introduce traffic while monitoring for
+errors. If the new version of the application is behaving correctly then the traffic is increased, if it is not then the Canary is 
+removed from the production environment and traffic reverted to the original version.
 
+![](images/canary.png)
 
-## Configuring the application
+Typically, this is coupled with a Retry, should the Canary deployment be faulty then the Retry will ensure that the system
+calls the existing version (Primary) abstracting the end user from any errors. 
 
-After installing the cluster and required software you can then install the application. To run the canary deployment demo
-you need to configure the following components:
+![](images/retry.png)
 
-* Consul CRDs for Service Mesh
+## Configuration entries
+
+Consul Service Mesh has all the capabilities you need in order to enable canary deployment of applications. You can leverage the
+Service Mesh Configuration Entries to control your applications traffic. For a Canary deployment you would create the following
+configuration entries.
+
+* **ServiceRouter** - Allows the configuration of a Retry to an upstream service
+* **ServiceSplitter** - Allows the split of traffic bettween different services or subset of services
+* **ServiceResolver** - Allows the definition of virtual services or subsets in services
+
+![](images/config_1.png)
+
+To determine the destination service instance Consul uses these configuration entries. The service router configures the routing of traffic to a destination service using L7 HTTP metadata like the Path or Headers. It also allows the configuration of retries or timeouts related to the outbound request. For example, you may have a service router for the service API that applies 3 retries before failing. 
+
+Next in the chain is the ServiceSplitter. The ServiceSplitter allows for weighted routing between multiple services or subsets of the same service, in this example you will be splitting traffic between your Canary and Primary subsets of the API service.
+
+Finally the Consul uses a ServiceResolver to define the different subsets in a service. In this example you will configure two 
+subsets api-primary and api-canary. Selection of the endpoints that make up this group can be done by writing a query that uses Consuls
+service catalog.
+
+Putting all that together you get a more detailed flow like the below example:
+
+![](images/config_2.png)
+
+## Performing a Canary deployment
+
+Once defined the ServiceRouter and ServiceResolver configurations do not need to change, to control the amount of traffic sent to either 
+the Primary or the Canary you would update the ServiceSplitter configuration, monitor for errors and again update the ServiceSplitter.
+This is a task which could be performed 100% manually, however it we can also codify this manual process and leverage wonderful tools 
+like Flagger to do this for us.
+
+This tutorial will walk you through all the steps needed to enable canary deployments: 
+
+* Kubernetes Custom Resources for Consul Configuration
 * Flagger configuration
 * Grafana Dashboard
 * Load generator
 * Application Deployment
 
-### Consul CRDs for Service Mesh
-
-Flagger will controll the traffic splitting however for this to work additional configuration needs to be added 
-to Consul.
-
-#### ServiceDefaults
-
-First are the `ServiceDefaults`, this configuration informs Consul that the services `web` and `api` are 
-`HTTP` services. Setting the protocol for the service changes the way that the service mesh emits metrics.
-Using the HTTP protocol we will be able to see metrics related to the HTTP requests and responses including status codes.
-Flagger uses this information to determine the health of a canary.
-
-```yaml title="/app/consul-config.yaml"
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceDefaults
-metadata:
-  name: web
-spec:
-  protocol: http
-
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceDefaults
-metadata:
-  name: api
-spec:
-  protocol: http
-```
-
-#### ServiceRouter
-
-Next we need to configure the `ServiceRouter`, the `ServiceRouter` allows you to
-set configuration such as retries for a service. Retries are essential when 
-running canary deployments as they protect the end user in the instance that the deployed 
-canary is faulty.
-
-```yaml
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceRouter
-metadata:
-  name: api
-spec:
-  routes:
-  - destination:
-      service: "api"
-      numRetries: 3
-      retryOnStatusCodes: [500, 503]
-```
-
-Lastly you need to confiugre the `ServiceResolver`, a `ServiceResolver` allows a
-virtual subsets of a Consul service to be defined. These subsets are configured to 
-direct traffic to the `Primary` or the currently deployed service, and the `Canary`
-version of the service.  
-
-The `TrafficSplitter` which is automatically configured Flagger uses the subsets defined in
-in the `ServiceResolver` to split traffic between the two versions.   The configuration for 
-this is based on Consul's filter options: https://www.consul.io/api-docs/health#filtering-2 
-
-When Flagger takes control of your Pod it appends `primary` to the name, and since the ID  
-of the service in Consul is the Pod name we can use this to create the subsets.
-
-```yaml
----
-apiVersion: consul.hashicorp.com/v1alpha1
-kind: ServiceResolver
-metadata:
-  name: api
-spec:
-  defaultSubset: api-primary
-  subsets:
-    api-primary:
-      filter: "Service.ID contains \"api-primary\""
-      onlyPassing: true
-    api-canary:
-      filter: "Service.ID not contains \"api-primary\""
-      onlyPassing: true
-```
-
-#### Add the Consul config to the cluster
-
-<Tabs
-  className="unique-tabs"
-  groupId="environment"
-  defaultValue="shipyard"
-  values={[
-    {label: 'Shipyard', value: 'shipyard'},
-    {label: 'External Cluster', value: 'external'},
-  ]}>
-<TabItem value="shipyard">
-
-```shell
-kubectl apply -f ./consul-config.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-</TabItem>
-<TabItem value="external">
-
-In your terminal:
-
-```shell
-kubectl apply -f ./consul-config.yaml
-```
-
-</TabItem>
-</Tabs>
-
-
-## Add the Flagger config
-
-<Tabs
-  className="unique-tabs"
-  groupId="environment"
-  defaultValue="shipyard"
-  values={[
-    {label: 'Shipyard', value: 'shipyard'},
-    {label: 'External Cluster', value: 'external'},
-  ]}>
-<TabItem value="shipyard">
-
-```shell
-kubectl apply -f ./consul-config.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-</TabItem>
-<TabItem value="external">
-
-In your terminal:
-
-```shell
-kubectl apply -f ./consul-config.yaml
-```
-
-</TabItem>
-</Tabs>
-```shell
-kubectl apply -f ./flagger.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-## Add the Grafana dashboard
-
-```shell
-kubectl apply -f ./dashboard.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-## Setup the application
-
-```shell
-kubectl apply -f ./web.yaml -f ./api.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-## Add some automated load generation
-
-```shell
-kubectl apply -f ./load-generator.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-## View the dashboard in Grafana
-
-If you look at the dashboard you will see the requests to the Web service and also the upstream calls to the API service.
-
-**User:** admin  
-**Pass:** admin
-
-**Link:**
-[http://localhost:8080/d/irtYjefGk/canary?orgId=1&refresh=10s](http://localhost:8080/d/irtYjefGk/canary?orgId=1&refresh=10s)
-
-## Modify the API
-
-```shell
-kubectl apply -f ./api_v2.yaml
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-If you look at Consul you will see that there are now 3 more instances
-
-[http://localhost:8500/ui/dc1/services/api/instances](http://localhost:8500/ui/dc1/services/api/instances)
-
-Flagger will automatically create a service splitter and start sending a small percentage of traffic to the new instances.
-
-
-```shell
-consul config read -kind service-splitter -name api
-```
-
-<p>
-<Terminal target="tools.container.shipyard.run" shell="/bin/bash" workdir="/app" user="root" expanded />
-</p>
-
-You will also start to see the traffic become distributed between the canary and the primary, assuming it succeedes 
-flagger will promote the canary and remove the old version.
-
-[http://localhost:8080/d/irtYjefGk/canary?orgId=1&refresh=10s](http://localhost:8080/d/irtYjefGk/canary?orgId=1&refresh=10s)
+First let's start with configuring Consuls ServiceRouter and Service Resolver.

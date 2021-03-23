@@ -33,5 +33,3 @@ spec:
           value: "api"
         - name: "MESSAGE"
           value: "Response from API"
-          #  - name: "ERROR_RATE"
-          #    value: "0.2"

@@ -48,8 +48,8 @@ helm install flagger flagger/flagger -f ../helm/flagger-values.yaml
 ### Consul-SMI Controller
 
 ```
-helm repo add smi-controler https://nicholasjackson.io/smi-controller-sdk/
-helm install smi-controller smi-controller/smi-controller -f ../helm/consul-smi-controller.yaml
+helm repo add nicholasjackson https://nicholasjackson.io/smi-controller-sdk/
+helm install smi-controller nicholasjackson/smi-controller -f ../helm/consul-smi-controller.yaml
 ```
 
 ## Log into Grafana

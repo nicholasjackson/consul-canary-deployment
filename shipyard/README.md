@@ -2,7 +2,7 @@
 title: Consul Service Mesh on Kubernetes with Monitoring
 author: Nic Jackson
 slug: k8s_consul_stack
-shipyard_version: ">= 0.2.13"
+shipyard_version: ">= 0.3.2"
 ---
 
 # Consul Service Mesh on Kubernetes with Monitoring
