@@ -156,7 +156,7 @@ and the parameters for the roll out. In the `analysis` section of the following 
 see these parameters. The definition tells flagger that you would like to increase the traffic sent to the canary 
 by 10% when the success rate is 99% or greater.
 
-```
+```yaml
 ---
 apiVersion: flagger.app/v1beta1
 kind: Canary
@@ -202,6 +202,7 @@ spec:
       thresholdRange:
         min: 99
       interval: 1m
+```
 
 ### Grafana dashboard
 
