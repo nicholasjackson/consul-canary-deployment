@@ -342,7 +342,7 @@ the service mesh. It also has an additional annotation `"consul.hashicorp.com/se
 annotation performs no function other than adding a tag to Consuls service catalog so that you can
 easily determine the version of the application.
 
-```
+```yaml
 ---
 # API service version 1
 apiVersion: apps/v1
