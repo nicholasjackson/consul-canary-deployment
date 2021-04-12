@@ -24,7 +24,7 @@ you need to configure the following components:
 
 ### Consul CRDs for Service Mesh
 
-Flagger will controll the traffic splitting however for this to work additional configuration needs to be added 
+Flagger will control the traffic splitting however for this to work additional configuration needs to be added 
 to Consul.
 
 #### ServiceDefaults
@@ -73,7 +73,7 @@ spec:
       retryOnStatusCodes: [500, 503]
 ```
 
-Lastly you need to confiugre the `ServiceResolver`, a `ServiceResolver` allows a
+Lastly you need to configure the `ServiceResolver`, a `ServiceResolver` allows a
 virtual subsets of a Consul service to be defined. These subsets are configured to 
 direct traffic to the `Primary` or the currently deployed service, and the `Canary`
 version of the service.  
@@ -111,7 +111,7 @@ a `Canary` resource which defines the actual Flagger config.
 #### MetricTemplate
 
 The `MetricTemplate` defines the query that Flagger will use to check the health of the Canary. The following
-query gets the number of succesful requests, divides it by the total requests to return the sucess percentage
+query gets the number of successful requests, divides it by the total requests to return the success percentage
 and then multiplies this by 100.
 
 ```yaml
@@ -152,11 +152,11 @@ spec:
 #### Canary
 
 Next you configure the `Canary`, the `Canary` resource defines the deployment that Flagger will control
-and the parameters for the roll out. In the `analysis` section of the following resouce definition, you can
+and the parameters for the roll out. In the `analysis` section of the following resource definition, you can
 see these parameters. The definition tells flagger that you would like to increase the traffic sent to the canary 
 by 10% when the success rate is 99% or greater.
 
-```
+```yaml
 ---
 apiVersion: flagger.app/v1beta1
 kind: Canary
@@ -202,6 +202,7 @@ spec:
       thresholdRange:
         min: 99
       interval: 1m
+```
 
 ### Grafana dashboard
 
@@ -241,7 +242,7 @@ data:
 
 ### Load Generation
 
-To simulate load on the system and to reduce repetitive stran injuries from pressing refresh in your browser a simple
+To simulate load on the system and to reduce repetitive strain injuries from pressing refresh in your browser a simple
 10 concurrent user load generator has been configured using [K6](https://k6.io/). The load test calls the web
 endpoint which in turn calls the api.
 
@@ -335,13 +336,13 @@ spec:
 
 #### API application
 
-The `api` is the applicaction which you are using for the canary again is a standard deployment.
+The `api` is the application which you are using for the canary again is a standard deployment.
 This deployment like the `web` deployment also has the annotations which allow consul to add it as part of
 the service mesh. It also has an additional annotation `"consul.hashicorp.com/service-tags": "v1"`, this 
 annotation performs no function other than adding a tag to Consuls service catalog so that you can
 easily determine the version of the application.
 
-```
+```yaml
 ---
 # API service version 1
 apiVersion: apps/v1
@@ -504,5 +505,3 @@ spec:
 service/api-service unchanged
 deployment.apps/api configured
 ```
-
-
